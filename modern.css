@@ -1,0 +1,148 @@
+/* Visual refinement layer. Application behavior remains in the JS modules. */
+:root {
+  --green: #285c49;
+  --ink: #253e33;
+  --muted: #68796f;
+  --cream: #f7f8f3;
+  --line: #e0e8de;
+}
+body { background: radial-gradient(ellipse at 85% 0%, #e9efe3 0, transparent 42%), var(--cream); }
+.site-header { height: 88px; border-bottom-color: #d8e3d5; }
+.brand { letter-spacing: -1.1px; }
+.brand-logo { width: 42px; height: 42px; }
+nav { gap: 22px; }
+nav a { position: relative; padding-block: 8px; }
+nav a::after { content: ''; position: absolute; height: 2px; background: #77967b; bottom: 0; left: 0; width: 0; transition: width .2s; }
+nav a:hover::after { width: 100%; }
+.button { border-radius: 12px; padding: 14px 21px; box-shadow: 0 4px 10px #204d3c0d; }
+.secondary { box-shadow: none; background: #f5f8f1; }
+.hero { padding-block: 66px 58px; gap: 65px; }
+.hero h1 { font-size: clamp(44px, 4.8vw, 66px); letter-spacing: -3.1px; line-height: 1.12; }
+.hero h1 em { color: #70916d; position: relative; }
+.hero h1 em::after { content: ''; position: absolute; left: 0; bottom: -5px; width: 100%; height: 7px; border-radius: 50%; border-top: 3px solid #e8bf79; transform: rotate(-4deg); }
+.hero-copy { font-size: 15px; line-height: 1.85; }
+.hero-actions { flex-wrap: wrap; gap: 14px 20px; }
+.hero-actions .found-action { background: #fff9; border: 1px solid #d9e3d3; border-radius: 12px; padding: 13px 15px; font-size: 12px; }
+.hero-actions .text-link { font-size: 12px; }
+.hero .eyebrow { width: fit-content; padding: 8px 12px; background: #eaf0e3; border: 1px solid #dce6d3; border-radius: 30px; font-size: 9px; }
+.hero-art { height: 374px; border-radius: 130px 130px 28px 28px; border: 8px solid #fff9; background: radial-gradient(circle at 50% 45%, #f3f3dd, #dce8d0); box-shadow: 0 22px 55px -30px #385e3960; }
+.art-caption { top: 46px; left: 32px; font-size: 11px; }
+.art-sun { background: #edcb8b; box-shadow: 0 0 0 14px #edcb8b24; }
+.floating-note { display: flex; align-items: center; gap: 10px; bottom: 16px; left: 20px; padding: 12px 17px; border-radius: 13px; background: #fffffff0; font-size: 12px; box-shadow: 0 10px 25px #28483315; }
+.floating-note small { display: block; font-size: 10px; margin-top: 3px; }
+.note-pin { display: grid; place-items: center; width: 34px; height: 34px; background: #ebf2e4; color: var(--green); border-radius: 10px; font-size: 22px; }
+.storage-notice { background: transparent; border: 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); border-radius: 0; padding-block: 17px; }
+.reports-section { padding-top: 50px; }
+.section-heading h2 { font-size: 31px; letter-spacing: -1.3px; }
+#report-count { background: #e9efdf; padding: 7px 12px; border-radius: 30px; font-weight: 600; white-space: nowrap; }
+.filters { padding: 20px; border-radius: 18px; box-shadow: 0 6px 26px #26432d04; gap: 14px; }
+input, select, textarea { border-radius: 9px; padding: 12px; background: #f9fbf6; border-color: #dce5d8; font-size: 13px; }
+input:focus, select:focus, textarea:focus { background: white; border-color: #80a184; }
+.browse-layout { gap: 24px; }
+.cards { gap: 20px; }
+.report-card { border-radius: 19px; border-color: #e1e7dc; box-shadow: 0 6px 18px #1d392707; }
+.report-card.selected { border-color: #6c9373; box-shadow: 0 0 0 2px #6c937326, 0 10px 25px #1d39270b; }
+.card-art { height: 172px; margin: 8px 8px 0; border-radius: 12px; overflow: hidden; }
+.animal-emoji { font-size: 80px; }
+.status-badge { border-radius: 30px; padding: 7px 11px; border: 1px solid #ffffffb0; box-shadow: 0 3px 9px #1c332013; font-size: 9px; }
+.status-badge::before { content: ''; display: inline-block; width: 5px; height: 5px; background: currentColor; border-radius: 50%; margin-right: 6px; vertical-align: 1px; }
+.card-body { padding: 18px; }
+.card-body h3 { font-size: 17px; line-height: 1.4; }
+.card-location { font-size: 11px; }
+.card-description { font-size: 12px; line-height: 1.7; min-height: 40px; }
+.card-contact { padding: 9px 10px; background: #f2f5ed; border-radius: 8px; line-height: 1.6; }
+.card-bottom { display: block; }
+.card-animal { display: inline-block; margin-bottom: 8px; font-size: 11px; }
+.card-actions { gap: 6px; }
+.card-actions button { border: 1px solid #e0e7d9; border-radius: 8px; padding: 7px 9px; background: #f9fbf6; min-height: 36px; }
+.card-actions button:hover { background: #e9f0e0; }
+.card-actions .mark-found { background: #e9f1e2; border-color: #d1dfc6; }
+.map-panel { border-radius: 20px; border-color: #dce5d7; box-shadow: 0 10px 30px #253c2b07; }
+.map-heading { padding: 20px; }
+.map-heading .eyebrow { font-size: 10px; }
+.map-tag { border-radius: 30px; padding: 6px 10px; }
+.map-panel>.map { margin: 0 8px; border-radius: 12px; height: 365px; }
+.report-detail { padding: 24px; }
+.report-detail h3 { font-size: 20px; line-height: 1.4; }
+.report-detail p { font-size: 13px; }
+.report-detail .area-note { border-radius: 0 10px 10px 0; }
+.empty { background: #fff9; border: 1px dashed #c7d5be; border-radius: 20px; min-height: 310px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 18px; font-size: 14px; line-height: 1.8; padding: 40px; margin: 0; }
+.empty::before { content: ''; width: 55px; height: 55px; background: #eaf0e2 url('assets/pawfinder-logo.svg') center / 38px no-repeat; border: 12px solid #eaf0e2; box-sizing: content-box; border-radius: 25px; transform: rotate(-7deg); }
+.how { background: #edf2e7; padding: 36px; border: 1px solid #dfe7d7; border-radius: 24px; margin-top: 62px; }
+.steps { gap: 30px; }
+.steps article { padding-left: 46px; }
+.steps article>span { background: #fff9; border: 1px solid #d4e0c9; }
+.steps p { font-size: 13px; }
+footer { padding-block: 32px; }
+dialog { border-radius: 24px; box-shadow: 0 25px 100px #102a2850; }
+.dialog-top { background: #f8faf4; }
+.form-layout { gap: 28px; }
+.form-fields>h3, .form-location>h3 { color: #3d6850; font-size: 13px; padding-bottom: 13px; border-bottom: 1px solid #e3e9de; }
+.form-map { border-radius: 14px; height: 280px; }
+.radius-panel { border-radius: 14px; background: #eff4e8; border: 1px solid #dbe6cf; }
+.icon-button { background: white; }
+.map-tools { flex-wrap: wrap; }
+.leaflet-bar { border: 1px solid #d7e0d0 !important; border-radius: 10px !important; overflow: hidden; box-shadow: 0 3px 12px #24482b18 !important; }
+.leaflet-bar a { color: #315f45 !important; width: 34px !important; height: 34px !important; line-height: 34px !important; }
+.leaflet-control-attribution { background: #ffffffe8 !important; border-top-left-radius: 5px; }
+.leaflet-marker-icon.pet-location-pin { background: transparent; border: 0; }
+.pin-art { position: absolute; inset: 0; width: 48px; height: 58px; overflow: visible; filter: drop-shadow(0 4px 4px #14382445); transform-origin: 50% 95%; }
+.pin-body { fill: #2c684e; stroke: #fff; stroke-width: 2.5; }
+.pin-ground { position: absolute; width: 20px; height: 8px; bottom: -1px; left: 14px; border-radius: 50%; background: #254e3c40; box-shadow: 0 0 0 7px #427a5120; }
+.pet-location-pin:focus-visible { outline: 3px solid #c69546; outline-offset: 5px; border-radius: 24px; }
+.pet-location-pin.leaflet-marker-draggable { cursor: grab; }
+.pet-location-pin.is-dragging { cursor: grabbing; }
+.pet-location-pin.is-dragging .pin-art { filter: drop-shadow(0 7px 7px #14382460); }
+.pet-pin-tooltip { background: #214c3d; color: white; border: 0; border-radius: 8px; padding: 7px 11px; font-size: 11px; box-shadow: 0 4px 12px #17342626; }
+.leaflet-tooltip-top.pet-pin-tooltip::before { border-top-color: #214c3d; }
+@media (prefers-reduced-motion: no-preference) {
+  .pin-art { animation: pin-arrive .4s ease-out both; transition: filter .2s; }
+  .pin-ground { animation: pin-ring 2.4s ease-out 2; }
+  @keyframes pin-arrive { from { opacity: 0; transform: translateY(-14px) scale(.85); } 70% { opacity: 1; transform: translateY(2px) scale(1.03); } to { transform: none; } }
+  @keyframes pin-ring { 0%,100% { box-shadow: 0 0 0 3px #427a5120; } 65% { box-shadow: 0 0 0 15px #427a5100; } }
+}
+@media (max-width: 1050px) {
+  nav { gap: 15px; }
+  nav .found-action { display: none; }
+  .hero { gap: 32px; }
+  .hero-art { height: 330px; }
+  .hero h1 { font-size: 49px; }
+  .card-body { padding: 14px; }
+  .card-art { height: 148px; }
+}
+@media (max-width: 760px) {
+  .wrap { width: calc(100% - 32px); }
+  .site-header { height: 78px; }
+  .brand { font-size: 21px; gap: 5px; }
+  .brand-logo { width: 33px; height: 33px; }
+  .brand-country { font-size: 8px; letter-spacing: 1px; padding-left: 7px; }
+  nav .button { border-radius: 10px; font-size: 10px; padding: 10px; }
+  .hero { padding-block: 34px; gap: 28px; }
+  .hero h1 { font-size: clamp(40px, 10vw, 54px); letter-spacing: -2px; }
+  .hero-copy { font-size: 14px; }
+  .hero-art { height: 300px; max-width: 410px; }
+  .hero-actions { gap: 12px; }
+  .hero-actions .button { padding: 13px; }
+  .hero-actions .found-action { padding: 12px; font-size: 11px; }
+  .hero-actions .text-link { width: 100%; }
+  .section-heading { flex-wrap: wrap; gap: 12px; }
+  .section-heading h2 { font-size: 26px; }
+  #report-count { margin: 0; }
+  .filters { padding: 15px; gap: 12px; }
+  .cards { gap: 12px; }
+  .card-art { height: 142px; margin: 6px 6px 0; }
+  .card-body h3 { font-size: 15px; }
+  .card-contact { font-size: 10px; }
+  .card-actions { gap: 5px; }
+  .card-actions button { font-size: 10px; padding: 7px; }
+  .map-panel>.map { height: 320px; }
+  .how { padding: 25px 20px; margin-top: 38px; }
+  .steps { gap: 24px; }
+  dialog { border-radius: 18px; width: calc(100% - 20px); }
+  .form-map { height: 270px; }
+}
+@media (max-width: 390px) {
+  .brand-country { display: none; }
+  .cards { grid-template-columns: 1fr; }
+  .card-art { height: 185px; }
+}
