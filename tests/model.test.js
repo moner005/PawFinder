@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {suggestedRadius,effectiveRadius,validateReport,filterReports,localDateTime} from '../js/model.js';
 import {loadReports,saveReports,STORAGE_KEY} from '../js/storage.js';
-import {createPlaceSearch} from '../js/api.js';
+import {createPlaceSearch,createReverseGeocode} from '../js/api.js';
 const now = new Date('2026-09-19T12:00:00Z').getTime();
 const report = {id:'one',title:'Missing Luna',description:'Ginger cat with green collar',contact:'owner@example.com',location:'Damascus',status:'lost',animal:'cat',lastSeen:'2026-09-18T12:00:00Z',coordinates:{lat:33.51,lng:36.29},radius:500,radiusMode:'auto'};
 test('illustrative radius defaults, elapsed time and automatic cap', () => {
@@ -60,4 +60,13 @@ test('API rejects HTTP, malformed and network failures', async () => {
   }
   const search=createPlaceSearch({geocodingUrl:'https://example.com/search'},{fetcher:async()=>{throw Error('Network unavailable');}});
   await assert.rejects(search('Damascus'),/Network/);
+});
+test('reverse geocoding turns a selected coordinate into a city label', async () => {
+  const reverse=createReverseGeocode({geocodingUrl:'https://example.com/search'},{now:()=>now,fetcher:async url=>{
+    assert.equal(url.pathname,'/reverse');
+    assert.equal(url.searchParams.get('lat'),'33.51');
+    assert.equal(url.searchParams.get('lon'),'36.29');
+    return {ok:true,json:async()=>({address:{neighbourhood:'Al-Malki',city:'Damascus'}})};
+  }});
+  assert.equal(await reverse({lat:33.51,lng:36.29}),'Al-Malki, Damascus');
 });

@@ -21,8 +21,11 @@ Tests use Node's built-in test runner; there are no npm dependencies to install.
 ## What works
 
 - Submit lost/found reports with title, animal type, description, contact, last-seen date/time, neighborhood, and coordinates.
-- Click the map or drag its pin. Keyboard users can enter latitude/longitude.
+- Click the map or drag its pin. A map click reverse-geocodes the selected public coordinates and fills Neighborhood / city when a place is available. Keyboard users can enter latitude/longitude.
+- **Use my current location** uses the browser's GPS/geolocation permission, then centers the map and fills the nearby neighborhood/city where possible.
 - Explicit place-name search calls Nominatim using `fetch`, `async`/`await`, response checks and a timeout. Picking a result centers the map; then choose the exact spot.
+- An **I found an animal** button opens the form with Found selected; found reports display a marker but no search circle.
+- Add an optional JPG, PNG or WebP photo up to 1 MB. It is saved only in this browser with the report; it is not uploaded to an API.
 - Combined text, status, animal, and location filters.
 - JSON/localStorage persistence. Reports stay in this browser and origin; changing localhost/127.0.0.1/port changes the storage origin. They are not shared online.
 - No preloaded fictional reports or demo labels, as requested.
@@ -45,6 +48,8 @@ Base: cat 250 m, dog 500 m, other 250 m. These are **illustrative app design cho
 
 The public limit is **one request per second across the entire application**, not per visitor. This browser-only implementation is intended for your local presentation; it cannot enforce an aggregate limit across different devices. Before any public/shared deployment, use a provider with suitable terms or an application-wide rate-limited proxy, review current policy, and retain an easy provider-switch mechanism. There is no automatic retry storm.
 
+An explicitly selected map point (including an approved GPS result) makes one reverse-geocoding request to turn latitude/longitude into a nearby neighborhood/city. It sends coordinates to Nominatim; it never sends your contact information, description or photo. Full request/response examples are in [API_FETCH_EXPLAINER.md](API_FETCH_EXPLAINER.md).
+
 OSM [tile policy](https://operations.osmfoundation.org/policies/tiles/) was also reviewed. The app uses the required HTTPS tile URL, visible linked OpenStreetMap attribution, normal browser caching and Referer behavior. It does not prefetch, bulk download, or offer offline tile downloads. Do not disable Referer, override cache behavior, or remove attribution. Third-party services may see your IP and place queries. Fonts can fail without stopping the app.
 
 Leaflet documentation: https://leafletjs.com/reference.html — circle radii are in meters.
@@ -66,7 +71,7 @@ User/API content is inserted with `textContent`, never interpolated into HTML. S
 ## Two-person presentation
 
 1. **Partner A (UI/data):** describe the problem, add a report, explain objects/arrays, `FormData`, validation, event listeners and state → render.
-2. **Partner B (map/API):** perform one deliberate Syrian place search, show the Network request, select a result, place/drag the pin, explain `fetch`/JSON and the radius formula.
+2. **Partner B (map/API):** perform one deliberate Syrian place search, show the Network request, select a result, place/drag the pin, explain `fetch`/JSON, GPS vs reverse geocoding, and the radius formula.
 3. Change animal/time in automatic mode; move the slider, change animal again, and show the manual radius stays fixed. Reset the suggestion.
 4. Save, combine filters, open the report and refresh the page to demonstrate localStorage.
 5. Submit a found report and show there is no circle. Explain browser-only storage and why prediction claims would be misleading.
@@ -84,3 +89,9 @@ Understand each function before presenting. Focus on how data flows, not memoriz
 - Simulate geocoder 429/network errors, blocked Leaflet/tiles, and unavailable/corrupt localStorage. Show readable warnings and no false success claims.
 
 See `VERIFICATION.md` for checks actually run during implementation.
+
+## Publishing with GitHub Pages
+
+The repository remote is already `https://github.com/moner005/PawFinder.git`. To publish, first push the current code to its `main` branch. Then on GitHub: **PawFinder → Settings → Pages → Build and deployment → Deploy from a branch → main → /(root) → Save**. GitHub will show the public Pages URL after deployment. Open that URL and test the map/GPS feature over HTTPS.
+
+GitHub Pages provides HTTPS, which browser GPS normally requires. Local reports/photos remain per browser and will not appear for other visitors. Before sharing publicly, review the Nominatim/OSM limits above: the browser-only rate limiter cannot enforce the provider's one-request-per-second limit across all visitors. A proper shared deployment needs a provider or backend that supports that traffic.

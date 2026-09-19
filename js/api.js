@@ -50,3 +50,41 @@ export function createPlaceSearch(config, { fetcher = fetch, storage = null, now
     } finally { busy = false; }
   };
 }
+
+// Reverse geocoding is deliberately triggered by a map/GPS action, never by movement.
+// It converts public coordinates into a readable nearby place label for the form.
+export function createReverseGeocode(config, { fetcher = fetch, storage = null, now = Date.now } = {}) {
+  let busy = false;
+  return async function reverseGeocode({ lat, lng }) {
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) throw new Error('A valid map location is needed.');
+    if (busy) return null;
+    busy = true;
+    const run = async () => {
+      let previous = 0;
+      try { previous = Number(storage?.getItem('pawfinder-last-search')) || 0; } catch {}
+      const pause = Math.max(0, 1100 - (now() - previous));
+      if (pause) await new Promise(resolve => setTimeout(resolve, pause));
+      const requestTime = now();
+      try { storage?.setItem('pawfinder-last-search', String(requestTime)); } catch {}
+      const url = new URL(config.geocodingUrl.replace(/\/search$/, '/reverse'));
+      url.search = new URLSearchParams({ lat:String(lat), lon:String(lng), format:'jsonv2', zoom:'16', 'accept-language':'en' });
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000);
+      try {
+        const response = await fetcher(url, { signal:controller.signal, headers:{Accept:'application/json'} });
+        if (!response.ok) throw new Error(`Location lookup unavailable (HTTP ${response.status}).`);
+        const data = await response.json();
+        const address = data?.address;
+        if (!address || typeof address !== 'object') return null;
+        const neighborhood = address.neighbourhood || address.suburb || address.quarter || address.village || address.town || address.city || address.county || address.state;
+        const city = address.city || address.town || address.village || address.state;
+        return [neighborhood, city].filter((value, index, values) => typeof value === 'string' && values.indexOf(value) === index).join(', ') || data.display_name?.split(',').slice(0, 2).join(', ') || null;
+      } catch (error) {
+        if (error.name === 'AbortError') throw new Error('Location lookup timed out.');
+        throw error;
+      } finally { clearTimeout(timeout); }
+    };
+    try { return globalThis.navigator?.locks ? await navigator.locks.request('pawfinder-geocoding', run) : await run(); }
+    finally { busy = false; }
+  };
+}

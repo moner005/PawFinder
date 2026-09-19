@@ -5,7 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#204c3e">
-  <title>PawFinder Syria · A little help. A way home.</title>
+  <title>PawFinder</title>
+  <link rel="icon" href="assets/pawfinder-logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="anonymous">
   <script type="module" src="js/app.js"></script>
@@ -14,10 +15,10 @@
 <body>
   <a class="skip-link" href="#reports">Skip to reports</a>
   <header class="site-header wrap">
-    <a class="brand" href="#"><span class="brand-icon" aria-hidden="true">✣</span> PawFinder<span
+    <a class="brand" href="#"><img class="brand-logo" src="assets/pawfinder-logo.svg" alt=""> PawFinder<span
         class="brand-country">SYRIA</span></a>
     <nav aria-label="Main navigation"><a href="#reports">Find an animal</a><a href="#how-it-works">How it
-        works</a><button class="button" data-new-report>+ Report an animal</button></nav>
+        works</a><button class="text-button found-action" data-new-report-status="found">I found an animal</button><button class="button" data-new-report>+ Report an animal</button></nav>
   </header>
   <main>
     <section class="hero wrap">
@@ -27,7 +28,7 @@
         <p class="hero-copy">Lost a companion? Found a new friend?<br>Help animals in Syria find their people, one
           report at a time.</p>
         <div class="hero-actions"><button class="button" data-new-report>Report lost or found <span
-              aria-hidden="true">↗</span></button><a href="#reports" class="text-link">Explore reports ↓</a></div>
+              aria-hidden="true">↗</span></button><button class="text-button found-action" data-new-report-status="found">I found an animal ↗</button><a href="#reports" class="text-link">Explore reports ↓</a></div>
         <p class="quiet">Made for our neighborhoods. Built with care.</p>
       </div>
       <div class="hero-art" aria-hidden="true"><span class="art-sun"></span><span class="orbit orbit-one"></span><span
@@ -123,7 +124,7 @@
       </div>
     </section>
   </main>
-  <footer class="wrap"><a class="brand" href="#">✣ PawFinder <span class="brand-country">SYRIA</span></a>
+  <footer class="wrap"><a class="brand" href="#"><img class="brand-logo" src="assets/pawfinder-logo.svg" alt=""> PawFinder <span class="brand-country">SYRIA</span></a>
     <p>For the paws that bring us together.</p>
   </footer>
   <dialog id="report-dialog" aria-labelledby="dialog-title">
@@ -150,7 +151,7 @@
               placeholder="Appearance, collar, temperament, and useful details"></textarea></label><label>Contact
             information<input name="contact" required minlength="3" maxlength="160"
               placeholder="Phone number or email"><small>Stored locally. Use only contact details you have permission to
-              share.</small></label><label>Last seen (your local time)<input name="lastSeen" id="last-seen"
+              share.</small></label><label>Add a photo <span class="optional">Optional</span><input id="report-image" name="image" type="file" accept="image/jpeg,image/png,image/webp"><small>Saved only in this browser. JPG, PNG, or WebP; maximum 1 MB.</small></label><label>Last seen (your local time)<input name="lastSeen" id="last-seen"
               type="datetime-local" required></label><label>Neighborhood / city<input name="location"
               id="report-location" required minlength="2" maxlength="160" placeholder="e.g. Al-Malki, Damascus"></label>
         </div>
@@ -161,6 +162,7 @@
           <p class="hint">Search only place names, not personal information. Or click the map directly.</p>
           <div id="place-results" class="place-results"></div>
           <p id="place-message" role="status" class="feedback"></p>
+          <div class="map-tools"><button type="button" class="button secondary gps-button" id="use-gps">⌖ Use my current location</button><span>GPS asks the browser for permission.</span></div>
           <div id="form-map" class="map form-map" aria-label="Click to choose last-seen location"></div>
           <p id="form-map-message" class="map-message" role="status"></p>
           <p class="hint">Click to place the pin. Drag it to correct the position.</p>
@@ -199,7 +201,7 @@
   </dialog>
   <template id="card-template">
     <article class="report-card">
-      <div class="card-art"><span class="status-badge"></span><span class="animal-emoji" aria-hidden="true"></span>
+      <div class="card-art"><img class="report-image" alt=""><span class="status-badge"></span><span class="animal-emoji" aria-hidden="true"></span>
       </div>
       <div class="card-body">
         <p class="card-location"></p>

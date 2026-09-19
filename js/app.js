@@ -1,6 +1,6 @@
 import { suggestedRadius, effectiveRadius, validateReport, filterReports, localDateTime, validCoordinates } from './model.js';
 import { loadReports, saveReports } from './storage.js';
-import { createPlaceSearch } from './api.js';
+import { createPlaceSearch, createReverseGeocode } from './api.js';
 import { loadMapLibrary, createMap } from './map.js';
 
 const $ = selector => document.querySelector(selector);
@@ -16,7 +16,9 @@ let radiusMode = 'auto';
 let browseMap;
 let formMap;
 let searchPlaces;
+let reverseGeocode;
 let searchVersion = 0;
+let imageData = '';
 $('#storage-message').textContent = loaded.warning;
 
 function filters() {
@@ -36,6 +38,12 @@ function render() {
     badge.textContent = report.status;
     badge.classList.add(report.status);
     card.querySelector('.animal-emoji').textContent = {cat:'🐈',dog:'🐕',other:'🐾'}[report.animal];
+    if (report.imageData) {
+      const image = card.querySelector('.report-image');
+      image.src = report.imageData;
+      image.alt = `Photo attached to ${report.title}`;
+      card.querySelector('.card-art').classList.add('has-image');
+    }
     card.querySelector('.card-location').textContent = `⌖ ${report.location}`;
     card.querySelector('h3').textContent = report.title;
     card.querySelector('.card-description').textContent = report.description;
@@ -89,15 +97,31 @@ function syncRadius() {
   formMap?.setRadius(found || suggestion === null ? null : radius);
   $('#last-seen').setCustomValidity(suggestion === null ? 'Choose a valid date and time, not in the future.' : '');
 }
-function selectPoint(next) {
+async function selectPoint(next) {
   point = next;
   $('#latitude').value = next.lat.toFixed(6);
   $('#longitude').value = next.lng.toFixed(6);
   $('#coordinate-label').textContent = `Selected: ${next.lat.toFixed(5)}, ${next.lng.toFixed(5)}`;
   syncRadius();
+  if (!reverseGeocode) return;
+  const version = ++searchVersion;
+  $('#place-message').textContent = 'Finding the nearby neighborhood/city…';
+  try {
+    const location = await reverseGeocode(next);
+    if (version !== searchVersion) return;
+    if (location) {
+      $('#report-location').value = location.slice(0, 160);
+      $('#place-message').textContent = 'Neighborhood / city filled from the selected map point.';
+    } else $('#place-message').textContent = 'No nearby neighborhood was returned. Please enter it manually.';
+  } catch (error) {
+    if (version === searchVersion) $('#place-message').textContent = `${error.message} Please enter the neighborhood/city manually.`;
+  }
 }
-for (const button of document.querySelectorAll('[data-new-report]')) button.addEventListener('click', () => {
-  form.reset(); point = null; radiusMode = 'auto'; searchVersion++;
+for (const button of document.querySelectorAll('[data-new-report],[data-new-report-status]')) button.addEventListener('click', () => {
+  form.reset(); point = null; radiusMode = 'auto'; imageData = ''; searchVersion++;
+  const requestedStatus = button.dataset.newReportStatus || 'lost';
+  $('#report-status').value = requestedStatus;
+  $('#dialog-title').textContent = requestedStatus === 'found' ? 'Report a found animal' : 'Report a lost animal';
   $('#last-seen').value = localDateTime();
   $('#last-seen').max = localDateTime();
   $('#form-error').textContent = '';
@@ -112,12 +136,42 @@ for (const button of document.querySelectorAll('[data-new-report]')) button.addE
 $('#close-dialog').addEventListener('click', () => dialog.close());
 dialog.addEventListener('close', () => { searchVersion++; });
 for (const id of ['report-status','report-animal','last-seen']) $(`#${id}`).addEventListener('input', syncRadius);
+$('#report-status').addEventListener('change', () => { $('#dialog-title').textContent = $('#report-status').value === 'found' ? 'Report a found animal' : 'Report a lost animal'; syncRadius(); });
 $('#radius').addEventListener('input', () => { radiusMode = 'manual'; syncRadius(); });
 $('#reset-radius').addEventListener('click', () => { radiusMode = 'auto'; syncRadius(); });
 $('#set-coordinates').addEventListener('click', () => {
   const next = {lat:Number($('#latitude').value),lng:Number($('#longitude').value)};
   if (!$('#latitude').value || !$('#longitude').value || !validCoordinates(next)) { $('#form-error').textContent = 'Enter valid latitude (−90 to 90) and longitude (−180 to 180).'; return; }
   selectPoint(next); formMap?.setPoint(next,true); $('#form-error').textContent = '';
+});
+$('#report-image').addEventListener('change', event => {
+  const [file] = event.target.files;
+  imageData = '';
+  if (!file) return;
+  if (!['image/jpeg','image/png','image/webp'].includes(file.type) || file.size > 1024 * 1024) {
+    event.target.value = '';
+    $('#form-error').textContent = 'Choose a JPG, PNG, or WebP image smaller than 1 MB.';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => { imageData = String(reader.result); $('#form-error').textContent = 'Photo ready to save locally with this report.'; };
+  reader.onerror = () => { imageData = ''; $('#form-error').textContent = 'That photo could not be read. Try another image.'; };
+  reader.readAsDataURL(file);
+});
+$('#use-gps').addEventListener('click', () => {
+  const button = $('#use-gps');
+  if (!navigator.geolocation) { $('#place-message').textContent = 'GPS is not available in this browser. Click the map or enter coordinates.'; return; }
+  button.disabled = true;
+  $('#place-message').textContent = 'Requesting your current location…';
+  navigator.geolocation.getCurrentPosition(position => {
+    const next = {lat:position.coords.latitude, lng:position.coords.longitude};
+    formMap?.setPoint(next, true);
+    selectPoint(next);
+    button.disabled = false;
+  }, error => {
+    button.disabled = false;
+    $('#place-message').textContent = error.code === error.PERMISSION_DENIED ? 'Location permission was not granted. Click the map instead.' : 'Current location could not be found. Click the map instead.';
+  }, {enableHighAccuracy:true, timeout:10000, maximumAge:60000});
 });
 $('#search-place').addEventListener('click', async () => {
   const version = ++searchVersion;
@@ -149,7 +203,7 @@ form.addEventListener('submit', event => {
   event.preventDefault();
   syncRadius();
   const values = Object.fromEntries(new FormData(form));
-  const report = {...values, title:values.title.trim(), description:values.description.trim(), contact:values.contact.trim(), location:values.location.trim(), coordinates:point, radius:Number($('#radius').value), radiusMode, id:crypto.randomUUID()};
+  const report = {...values, image:undefined, imageData, title:values.title.trim(), description:values.description.trim(), contact:values.contact.trim(), location:values.location.trim(), coordinates:point, radius:Number($('#radius').value), radiusMode, id:crypto.randomUUID()};
   const errors = validateReport(report);
   if (errors.length) { $('#form-error').textContent = errors.join(' '); return; }
   report.lastSeen = new Date(report.lastSeen).toISOString();
@@ -175,6 +229,7 @@ async function initializeServices() {
     if (!response.ok) throw new Error('Could not load service configuration.');
     const config = await response.json();
     searchPlaces = createPlaceSearch(config, {storage});
+    reverseGeocode = createReverseGeocode(config, {storage});
     $('#geocoding-credit').textContent = config.geocodingAttribution;
     const L = await loadMapLibrary();
     browseMap = createMap(L, 'browse-map', config, $('#browse-map-message'));
