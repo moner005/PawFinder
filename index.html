@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#204c3e">
+  <title>PawFinder Syria · A little help. A way home.</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="anonymous">
+  <script type="module" src="js/app.js"></script>
+</head>
+
+<body>
+  <a class="skip-link" href="#reports">Skip to reports</a>
+  <header class="site-header wrap">
+    <a class="brand" href="#"><span class="brand-icon" aria-hidden="true">✣</span> PawFinder<span
+        class="brand-country">SYRIA</span></a>
+    <nav aria-label="Main navigation"><a href="#reports">Find an animal</a><a href="#how-it-works">How it
+        works</a><button class="button" data-new-report>+ Report an animal</button></nav>
+  </header>
+  <main>
+    <section class="hero wrap">
+      <div>
+        <p class="eyebrow"><span class="dot"></span> SMALL ACTS. HAPPY REUNIONS.</p>
+        <h1>Every paw deserves<br>a way <em>home.</em></h1>
+        <p class="hero-copy">Lost a companion? Found a new friend?<br>Help animals in Syria find their people, one
+          report at a time.</p>
+        <div class="hero-actions"><button class="button" data-new-report>Report lost or found <span
+              aria-hidden="true">↗</span></button><a href="#reports" class="text-link">Explore reports ↓</a></div>
+        <p class="quiet">Made for our neighborhoods. Built with care.</p>
+      </div>
+      <div class="hero-art" aria-hidden="true"><span class="art-sun"></span><span class="orbit orbit-one"></span><span
+          class="orbit orbit-two"></span>
+        <div class="art-caption">a little closer to home</div><svg class="pet-art" viewBox="0 0 450 330">
+          <path fill="#c8d7b5" d="M30 280Q110 215 200 260T430 280V330H30Z" />
+          <path d="M105 289Q60 251 85 207" fill="none" stroke="#d99558" stroke-width="27" stroke-linecap="round" />
+          <path d="M116 293Q88 222 144 188Q201 205 193 293Z" fill="#e6a86c" />
+          <path d="M103 189L94 124L135 147Q154 135 174 146L210 123L205 189Q161 226 103 189" fill="#e6a86c" />
+          <path d="M105 149L107 175L123 158M187 157L200 144L199 173" fill="#c87850" />
+          <ellipse cx="133" cy="177" rx="4" ry="6" fill="#29483c" />
+          <ellipse cx="181" cy="177" rx="4" ry="6" fill="#29483c" />
+          <path d="M151 189L162 189L157 195Z" fill="#955b46" />
+          <path d="M156 195Q146 205 139 197M156 195Q166 205 174 197" fill="none" stroke="#955b46" stroke-width="2" />
+          <path d="M130 211Q155 223 181 208" fill="none" stroke="#42664e" stroke-width="10" />
+          <circle cx="157" cy="219" r="6" fill="#f7d990" />
+          <path d="M231 293Q213 225 244 200L307 199Q345 233 326 293Z" fill="#f3e6cc" />
+          <path d="M227 157Q213 115 245 111L307 111Q342 126 330 172L316 202Q269 225 237 196Z" fill="#f3e6cc" />
+          <path d="M242 115Q204 97 205 159Q211 189 230 177L247 140M301 115Q338 100 348 155Q347 185 326 179L300 140"
+            fill="#97745a" />
+          <ellipse cx="253" cy="161" rx="4" ry="6" fill="#29483c" />
+          <ellipse cx="295" cy="161" rx="4" ry="6" fill="#29483c" />
+          <ellipse cx="275" cy="184" rx="10" ry="7" fill="#29483c" />
+          <path d="M274 191Q261 207 252 194M274 191Q288 207 298 194" fill="none" stroke="#29483c" stroke-width="3" />
+          <path d="M241 212Q278 225 317 208" fill="none" stroke="#c26a4d" stroke-width="11" />
+          <circle cx="279" cy="221" r="7" fill="#f7d990" />
+          <path d="M322 275Q368 281 358 242" fill="none" stroke="#f3e6cc" stroke-width="23" stroke-linecap="round" />
+          <path d="M133 280V307M175 280V307M251 279V306M308 279V306" stroke="#29483c" stroke-opacity=".2"
+            stroke-width="3" stroke-linecap="round" />
+        </svg>
+        <div class="floating-note">⌖ &nbsp; A place to start looking</div>
+      </div>
+    </section>
+    <div class="storage-notice wrap"><span class="notice-icon">i</span>
+      <p>Your reports are saved in this browser. They are not shared online.</p>
+    </div>
+    <p id="storage-message" class="wrap feedback" role="status"></p>
+    <section id="reports" class="wrap reports-section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">LOOK AROUND. LEND A HAND.</p>
+          <h2>Little faces, local places.</h2>
+        </div>
+        <p id="report-count" class="quiet" aria-live="polite"></p>
+      </div>
+      <div class="filters"><label class="search-field">Search reports<input id="filter-text" type="search"
+            placeholder="Name, description, or neighborhood…"></label><label>Status<select id="filter-status">
+            <option value="">Lost & found</option>
+            <option value="lost">Lost</option>
+            <option value="found">Found</option>
+          </select></label><label>Animal<select id="filter-animal">
+            <option value="">All animals</option>
+            <option value="cat">Cats</option>
+            <option value="dog">Dogs</option>
+            <option value="other">Other animals</option>
+          </select></label><label>Location<input id="filter-location" placeholder="e.g. Damascus"></label><button
+          class="button secondary" id="clear-filters">Reset</button></div>
+      <div class="browse-layout">
+        <div>
+          <div id="cards" class="cards"></div>
+          <p id="empty-state" class="empty" hidden>No reports match these filters. Try a different place or clear the
+            filters.</p>
+        </div>
+        <aside class="map-panel" aria-label="Selected report location">
+          <div class="map-heading"><span class="eyebrow">ON THE MAP</span><span class="map-tag">SYRIA</span></div>
+          <div id="browse-map" class="map" aria-label="Map of selected animal report"></div>
+          <p id="browse-map-message" class="map-message" role="status"></p>
+          <div id="report-detail" class="report-detail">
+            <h3>Start with a little local knowledge.</h3>
+            <p>Select a report to see its last-seen location and, for lost animals, a suggested search area.</p>
+          </div>
+        </aside>
+      </div>
+    </section>
+    <section id="how-it-works" class="how wrap">
+      <div>
+        <p class="eyebrow">FROM A SIGHTING TO A STARTING POINT</p>
+        <h2>A little help goes a long way.</h2>
+      </div>
+      <div class="steps">
+        <article><span>01</span>
+          <h3>Tell their story</h3>
+          <p>Add a few identifying details and when the animal was last seen.</p>
+        </article>
+        <article><span>02</span>
+          <h3>Pin the place</h3>
+          <p>Choose the location on the map. Adjust the search circle to suit the neighborhood.</p>
+        </article>
+        <article><span>03</span>
+          <h3>Look with care</h3>
+          <p>Start nearby. Ask neighbors, stay safe, and get permission before entering private property.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+  <footer class="wrap"><a class="brand" href="#">✣ PawFinder <span class="brand-country">SYRIA</span></a>
+    <p>For the paws that bring us together.</p>
+  </footer>
+  <dialog id="report-dialog" aria-labelledby="dialog-title">
+    <div class="dialog-top">
+      <div>
+        <p class="eyebrow">LET’S FIND THEIR WAY HOME</p>
+        <h2 id="dialog-title">Report an animal</h2>
+      </div><button type="button" class="icon-button" id="close-dialog" aria-label="Close report form">×</button>
+    </div>
+    <form id="report-form">
+      <div class="form-layout">
+        <div class="form-fields">
+          <h3>01 / The important details</h3>
+          <div class="two-fields"><label>Report type<select name="status" id="report-status">
+                <option value="lost">Lost animal</option>
+                <option value="found">Found animal</option>
+              </select></label><label>Animal type<select name="animal" id="report-animal">
+                <option value="cat">Cat</option>
+                <option value="dog">Dog</option>
+                <option value="other">Other</option>
+              </select></label></div><label>Report title<input name="title" required minlength="3" maxlength="80"
+              placeholder="e.g. Luna, ginger cat with a green collar"></label><label>Description<textarea
+              name="description" required minlength="10" maxlength="1000" rows="3"
+              placeholder="Appearance, collar, temperament, and useful details"></textarea></label><label>Contact
+            information<input name="contact" required minlength="3" maxlength="160"
+              placeholder="Phone number or email"><small>Stored locally. Use only contact details you have permission to
+              share.</small></label><label>Last seen (your local time)<input name="lastSeen" id="last-seen"
+              type="datetime-local" required></label><label>Neighborhood / city<input name="location"
+              id="report-location" required minlength="2" maxlength="160" placeholder="e.g. Al-Malki, Damascus"></label>
+        </div>
+        <div class="form-location">
+          <h3>02 / Where were they last seen?</h3><label>Search a Syrian place<span class="search-row"><input
+                id="place-query" placeholder="e.g. Damascus" maxlength="120"><button type="button" class="button"
+                id="search-place">Search</button></span></label>
+          <p class="hint">Search only place names, not personal information. Or click the map directly.</p>
+          <div id="place-results" class="place-results"></div>
+          <p id="place-message" role="status" class="feedback"></p>
+          <div id="form-map" class="map form-map" aria-label="Click to choose last-seen location"></div>
+          <p id="form-map-message" class="map-message" role="status"></p>
+          <p class="hint">Click to place the pin. Drag it to correct the position.</p>
+          <details class="coordinate-details">
+            <summary>Keyboard access / enter coordinates</summary>
+            <div class="two-fields"><label>Latitude<input id="latitude" type="number" min="-90" max="90"
+                  step="any"></label><label>Longitude<input id="longitude" type="number" min="-180" max="180"
+                  step="any"></label></div><button type="button" class="button secondary" id="set-coordinates">Use
+              coordinates</button>
+          </details>
+          <p id="coordinate-label" class="hint">No location selected yet.</p>
+          <div id="radius-panel" class="radius-panel">
+            <div class="radius-heading"><label for="radius">Starting search radius</label><output id="radius-value"
+                for="radius">250 m</output></div><input id="radius" type="range" min="100" max="10000" step="1"
+              value="250">
+            <div class="radius-heading"><span id="radius-mode">Automatic suggestion</span><button type="button"
+                class="text-button" id="reset-radius">Reset suggestion</button></div>
+            <p class="hint">Suggested search area—not a prediction. Adjust for local conditions.</p>
+            <details>
+              <summary>How is this calculated?</summary>
+              <p>Classroom defaults: cat 250 m, dog 500 m, other 250 m. Multiply by 1 + √(hours missing ÷ 24), capped at
+                5 km. These are app design choices, not animal-movement research. You can choose 100 m–10 km manually.
+              </p>
+            </details>
+          </div>
+          <p id="found-hint" class="hint" hidden>Found reports show a location pin, without a search circle.</p>
+          <p id="geocoding-credit" class="hint"></p>
+        </div>
+      </div>
+      <div class="form-bottom">
+        <p id="form-error" role="alert"></p>
+        <p class="quiet">This report stays in this browser. It is not published online.</p><button type="submit"
+          class="button">Save report locally ↗</button>
+      </div>
+    </form>
+  </dialog>
+  <template id="card-template">
+    <article class="report-card">
+      <div class="card-art"><span class="status-badge"></span><span class="animal-emoji" aria-hidden="true"></span>
+      </div>
+      <div class="card-body">
+        <p class="card-location"></p>
+        <h3></h3>
+        <p class="card-description"></p>
+        <div class="card-bottom"><span class="card-animal"></span><button class="text-button">View on map ↗</button>
+        </div>
+      </div>
+    </article>
+  </template>
+</body>
+
+</html>
