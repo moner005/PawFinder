@@ -19,6 +19,7 @@ let searchPlaces;
 let reverseGeocode;
 let searchVersion = 0;
 let imageData = '';
+let editingId = null;
 $('#storage-message').textContent = loaded.warning;
 
 function filters() {
@@ -48,8 +49,10 @@ function render() {
     card.querySelector('h3').textContent = report.title;
     card.querySelector('.card-description').textContent = report.description;
     card.querySelector('.card-animal').textContent = report.animal === 'other' ? 'Other animal' : report.animal;
-    card.querySelector('button').dataset.id = report.id;
-    card.querySelector('button').setAttribute('aria-label', `View ${report.title} on map`);
+    card.querySelector('.card-contact').textContent = `${report.status === 'found' ? 'Finder' : 'Owner'} contact: ${report.contact}`;
+    for (const button of card.querySelectorAll('button[data-action]')) button.dataset.id = report.id;
+    card.querySelector('[data-action="view"]').setAttribute('aria-label', `View ${report.title} on map`);
+    if (report.status === 'found') card.querySelector('[data-action="found"]').hidden = true;
     $('#cards').append(card);
   }
   if (selectedId && !visible.some(report => report.id === selectedId)) {
@@ -71,7 +74,7 @@ function showReport(report, center = true) {
   browseMap?.setRadius(radius);
   if (center && radius !== null) browseMap?.fit();
   const detail = $('#report-detail');
-  detail.replaceChildren(makeText('h3',report.title), makeText('p',report.description), makeText('p',`Last seen: ${new Date(report.lastSeen).toLocaleString()} · ${report.location}`), makeText('p',`Coordinates: ${report.coordinates.lat.toFixed(5)}, ${report.coordinates.lng.toFixed(5)}`), makeText('p',`Contact: ${report.contact}`,'detail-contact'));
+  detail.replaceChildren(makeText('h3',report.title), makeText('p',report.description), makeText('p',`Last seen: ${new Date(report.lastSeen).toLocaleString()} · ${report.location}`), makeText('p',`Coordinates: ${report.coordinates.lat.toFixed(5)}, ${report.coordinates.lng.toFixed(5)}`), makeText('p',`${report.status === 'found' ? 'Finder' : 'Owner'} contact: ${report.contact}`,'detail-contact'));
   if (radius !== null) detail.append(makeText('p',`${radius.toLocaleString()} m radius · ${report.radiusMode === 'auto' ? 'Automatic, updated for current elapsed time' : 'Manually adjusted'}. Suggested search area—not a prediction. Adjust for local conditions.`,'area-note'));
   else detail.append(makeText('p','Found animal: location marker only.'));
   render();
@@ -80,7 +83,19 @@ $('#cards').addEventListener('click', event => {
   const button = event.target.closest('button[data-id]');
   if (!button) return;
   const report = reports.find(item => item.id === button.dataset.id);
-  if (report) { showReport(report); if (matchMedia('(max-width:760px)').matches) $('.map-panel').scrollIntoView({behavior:'smooth',block:'start'}); }
+  if (!report) return;
+  if (button.dataset.action === 'edit') { openReportForm({report}); return; }
+  if (button.dataset.action === 'found') {
+    if (!confirm(`Mark “${report.title}” as found? You can still edit its details afterwards.`)) return;
+    reports = reports.map(item => item.id === report.id ? {...item, status:'found', foundAt:new Date().toISOString()} : item);
+    const updated = reports.find(item => item.id === report.id);
+    const saved = !loaded.readOnly && saveReports(storage, reports);
+    $('#storage-message').textContent = saved ? 'Report marked as found in this browser.' : 'Report changed for this session only; browser storage is unavailable.';
+    showReport(updated);
+    return;
+  }
+  showReport(report);
+  if (matchMedia('(max-width:760px)').matches) $('.map-panel').scrollIntoView({behavior:'smooth',block:'start'});
 });
 for (const key of ['text','status','animal','location']) $(`#filter-${key}`).addEventListener('input', render);
 $('#clear-filters').addEventListener('click', () => { for (const key of ['text','status','animal','location']) $(`#filter-${key}`).value = ''; render(); });
@@ -117,26 +132,47 @@ async function selectPoint(next) {
     if (version === searchVersion) $('#place-message').textContent = `${error.message} Please enter the neighborhood/city manually.`;
   }
 }
-for (const button of document.querySelectorAll('[data-new-report],[data-new-report-status]')) button.addEventListener('click', () => {
-  form.reset(); point = null; radiusMode = 'auto'; imageData = ''; searchVersion++;
-  const requestedStatus = button.dataset.newReportStatus || 'lost';
-  $('#report-status').value = requestedStatus;
-  $('#dialog-title').textContent = requestedStatus === 'found' ? 'Report a found animal' : 'Report a lost animal';
-  $('#last-seen').value = localDateTime();
+function updateFormLabels() {
+  const found = $('#report-status').value === 'found';
+  $('#contact-label').textContent = found ? 'Finder contact information' : 'Owner contact information';
+  if (editingId) $('#dialog-title').textContent = `Edit ${found ? 'found' : 'lost'} report`;
+  else $('#dialog-title').textContent = found ? 'Report a found animal' : 'Report a lost animal';
+}
+function openReportForm({status = 'lost', report = null} = {}) {
+  form.reset(); searchVersion++;
+  editingId = report?.id ?? null;
+  point = report?.coordinates ? {...report.coordinates} : null;
+  imageData = report?.imageData ?? '';
+  radiusMode = report?.radiusMode ?? 'auto';
+  $('#report-status').value = report?.status ?? status;
+  $('#report-animal').value = report?.animal ?? 'cat';
+  $('#last-seen').value = report ? localDateTime(new Date(report.lastSeen)) : localDateTime();
+  $('#report-location').value = report?.location ?? '';
+  form.elements.title.value = report?.title ?? '';
+  form.elements.description.value = report?.description ?? '';
+  form.elements.contact.value = report?.contact ?? '';
+  $('#radius').value = report?.radius ?? 250;
   $('#last-seen').max = localDateTime();
   $('#form-error').textContent = '';
-  $('#place-message').textContent = '';
+  $('#place-message').textContent = report?.imageData ? 'Existing photo will be kept unless you choose a replacement.' : '';
   $('#place-results').replaceChildren();
-  $('#coordinate-label').textContent = 'No location selected yet.';
+  if (point) {
+    $('#latitude').value = point.lat.toFixed(6);
+    $('#longitude').value = point.lng.toFixed(6);
+    $('#coordinate-label').textContent = `Selected: ${point.lat.toFixed(5)}, ${point.lng.toFixed(5)}`;
+  } else $('#coordinate-label').textContent = 'No location selected yet.';
   formMap?.clear();
+  if (point) formMap?.setPoint(point, true);
+  updateFormLabels();
   syncRadius();
   dialog.showModal();
   requestAnimationFrame(() => formMap?.resize());
-});
+}
+for (const button of document.querySelectorAll('[data-new-report],[data-new-report-status]')) button.addEventListener('click', () => openReportForm({status:button.dataset.newReportStatus || 'lost'}));
 $('#close-dialog').addEventListener('click', () => dialog.close());
 dialog.addEventListener('close', () => { searchVersion++; });
 for (const id of ['report-status','report-animal','last-seen']) $(`#${id}`).addEventListener('input', syncRadius);
-$('#report-status').addEventListener('change', () => { $('#dialog-title').textContent = $('#report-status').value === 'found' ? 'Report a found animal' : 'Report a lost animal'; syncRadius(); });
+$('#report-status').addEventListener('change', () => { updateFormLabels(); syncRadius(); });
 $('#radius').addEventListener('input', () => { radiusMode = 'manual'; syncRadius(); });
 $('#reset-radius').addEventListener('click', () => { radiusMode = 'auto'; syncRadius(); });
 $('#set-coordinates').addEventListener('click', () => {
@@ -203,14 +239,16 @@ form.addEventListener('submit', event => {
   event.preventDefault();
   syncRadius();
   const values = Object.fromEntries(new FormData(form));
-  const report = {...values, image:undefined, imageData, title:values.title.trim(), description:values.description.trim(), contact:values.contact.trim(), location:values.location.trim(), coordinates:point, radius:Number($('#radius').value), radiusMode, id:crypto.randomUUID()};
+  const report = {...values, image:undefined, imageData, title:values.title.trim(), description:values.description.trim(), contact:values.contact.trim(), location:values.location.trim(), coordinates:point, radius:Number($('#radius').value), radiusMode, id:editingId ?? crypto.randomUUID()};
   const errors = validateReport(report);
   if (errors.length) { $('#form-error').textContent = errors.join(' '); return; }
   report.lastSeen = new Date(report.lastSeen).toISOString();
-  reports = [report, ...reports];
+  const editing = Boolean(editingId);
+  reports = editing ? reports.map(item => item.id === report.id ? {...item, ...report} : item) : [report, ...reports];
   const saved = !loaded.readOnly && saveReports(storage, reports);
-  $('#storage-message').textContent = saved ? 'Report saved in this browser.' : 'Report added for this session only. Browser storage is unavailable; it will not survive a reload.';
+  $('#storage-message').textContent = saved ? `Report ${editing ? 'updated' : 'saved'} in this browser.` : `Report ${editing ? 'updated' : 'added'} for this session only. Browser storage is unavailable; it will not survive a reload.`;
   for (const key of ['text','status','animal','location']) $(`#filter-${key}`).value = '';
+  editingId = null;
   dialog.close();
   showReport(report);
   $('#reports').scrollIntoView({behavior:'smooth'});

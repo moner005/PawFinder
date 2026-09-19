@@ -1,6 +1,6 @@
 # PawFinder Syria
 
-A local lost-and-found animal reporting app, built with HTML, CSS and vanilla JavaScript. Leaflet provides the map. No build step, accounts, backend, editing/deletion, or deployment.
+A local lost-and-found animal reporting app, built with HTML, CSS and vanilla JavaScript. Leaflet provides the map. No build step, accounts, backend, deletion, or deployment.
 
 ## Run
 
@@ -25,6 +25,7 @@ Tests use Node's built-in test runner; there are no npm dependencies to install.
 - **Use my current location** uses the browser's GPS/geolocation permission, then centers the map and fills the nearby neighborhood/city where possible.
 - Explicit place-name search calls Nominatim using `fetch`, `async`/`await`, response checks and a timeout. Picking a result centers the map; then choose the exact spot.
 - An **I found an animal** button opens the form with Found selected; found reports display a marker but no search circle.
+- Each locally saved card can be edited. Lost cards can also be marked as found; Finder/Owner contact wording updates with the report type.
 - Add an optional JPG, PNG or WebP photo up to 1 MB. It is saved only in this browser with the report; it is not uploaded to an API.
 - Combined text, status, animal, and location filters.
 - JSON/localStorage persistence. Reports stay in this browser and origin; changing localhost/127.0.0.1/port changes the storage origin. They are not shared online.

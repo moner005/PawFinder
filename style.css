@@ -531,6 +531,7 @@ textarea::placeholder {
     border-top: 1px solid #edf0e8;
     padding-top: 11px
 }
+.card-contact{font-size:10px;color:var(--green);font-weight:700;margin:3px 0 9px;overflow-wrap:anywhere}.card-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.mark-found{color:#47713f}
 
 .card-animal {
     font-size: 10px;

@@ -148,9 +148,8 @@
               </select></label></div><label>Report title<input name="title" required minlength="3" maxlength="80"
               placeholder="e.g. Luna, ginger cat with a green collar"></label><label>Description<textarea
               name="description" required minlength="10" maxlength="1000" rows="3"
-              placeholder="Appearance, collar, temperament, and useful details"></textarea></label><label>Contact
-            information<input name="contact" required minlength="3" maxlength="160"
-              placeholder="Phone number or email"><small>Stored locally. Use only contact details you have permission to
+              placeholder="Appearance, collar, temperament, and useful details"></textarea></label><label><span id="contact-label">Owner contact information</span><input name="contact" required minlength="3" maxlength="160"
+              placeholder="Phone number or email" id="report-contact"><small>Stored locally. Use only contact details you have permission to
               share.</small></label><label>Add a photo <span class="optional">Optional</span><input id="report-image" name="image" type="file" accept="image/jpeg,image/png,image/webp"><small>Saved only in this browser. JPG, PNG, or WebP; maximum 1 MB.</small></label><label>Last seen (your local time)<input name="lastSeen" id="last-seen"
               type="datetime-local" required></label><label>Neighborhood / city<input name="location"
               id="report-location" required minlength="2" maxlength="160" placeholder="e.g. Al-Malki, Damascus"></label>
@@ -207,7 +206,8 @@
         <p class="card-location"></p>
         <h3></h3>
         <p class="card-description"></p>
-        <div class="card-bottom"><span class="card-animal"></span><button class="text-button">View on map ↗</button>
+        <p class="card-contact"></p>
+        <div class="card-bottom"><span class="card-animal"></span><div class="card-actions"><button class="text-button" data-action="view">View map ↗</button><button class="text-button" data-action="edit">Edit</button><button class="text-button mark-found" data-action="found">Mark as found</button></div>
         </div>
       </div>
     </article>
