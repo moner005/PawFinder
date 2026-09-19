@@ -8,6 +8,21 @@ const form = $('#report-form');
 const dialog = $('#report-dialog');
 let storage;
 try { storage = window.localStorage; } catch { storage = null; }
+const themeToggle = $('#theme-toggle');
+function applyTheme(theme) {
+  const dark = theme === 'dark';
+  document.documentElement.dataset.theme = dark ? 'dark' : '';
+  themeToggle.setAttribute('aria-pressed', String(dark));
+  themeToggle.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to night mode');
+  themeToggle.title = dark ? 'Switch to light mode' : 'Switch to night mode';
+}
+const savedTheme = (() => { try { return storage?.getItem('pawfinder-theme'); } catch { return null; } })();
+applyTheme(savedTheme === 'dark' || (!savedTheme && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light');
+themeToggle.addEventListener('click', () => {
+  const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  try { storage?.setItem('pawfinder-theme', next); } catch { /* Theme still works for this visit. */ }
+});
 const loaded = loadReports(storage);
 let reports = loaded.reports;
 let selectedId = null;

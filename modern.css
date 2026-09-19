@@ -10,6 +10,10 @@ body { background: radial-gradient(ellipse at 85% 0%, #e9efe3 0, transparent 42%
 .site-header { height: 88px; border-bottom-color: #d8e3d5; }
 .brand { letter-spacing: -1.1px; }
 .brand-logo { width: 42px; height: 42px; }
+.theme-toggle { width: 42px; height: 30px; border: 1px solid #d7e2d0; background: #f4f8ef; border-radius: 99px; padding: 3px; position: relative; color: #527a5b; display: grid; grid-template-columns: 1fr 1fr; align-items: center; font-size: 13px; isolation: isolate; }
+.theme-toggle::after { content: ''; position: absolute; z-index: -1; left: 3px; top: 3px; width: 22px; height: 22px; background: white; border-radius: 50%; box-shadow: 0 2px 5px #28452c20; transition: transform .24s ease; }
+.theme-toggle span { line-height: 1; text-align: center; pointer-events: none; }
+.theme-moon { opacity: .45; }
 nav { gap: 22px; }
 nav a { position: relative; padding-block: 8px; }
 nav a::after { content: ''; position: absolute; height: 2px; background: #77967b; bottom: 0; left: 0; width: 0; transition: width .2s; }
@@ -95,6 +99,38 @@ dialog { border-radius: 24px; box-shadow: 0 25px 100px #102a2850; }
 .pet-location-pin.is-dragging .pin-art { filter: drop-shadow(0 7px 7px #14382460); }
 .pet-pin-tooltip { background: #214c3d; color: white; border: 0; border-radius: 8px; padding: 7px 11px; font-size: 11px; box-shadow: 0 4px 12px #17342626; }
 .leaflet-tooltip-top.pet-pin-tooltip::before { border-top-color: #214c3d; }
+html[data-theme="dark"] { color-scheme: dark; }
+html[data-theme="dark"] body { background: radial-gradient(ellipse at 85% 0%, #1d3d35 0, transparent 48%), #101b19; color: #e8f0e9; }
+html[data-theme="dark"] .site-header { border-color: #29443c; }
+html[data-theme="dark"] .brand, html[data-theme="dark"] h1, html[data-theme="dark"] h2, html[data-theme="dark"] h3 { color: #f0f5ed; }
+html[data-theme="dark"] .brand-country { border-color: #56766b; color: #b9cabe; }
+html[data-theme="dark"] nav a, html[data-theme="dark"] .text-link { color: #dce9dc; }
+html[data-theme="dark"] .found-action { color: #dce9dc; background: #213a32; border-color: #426258; }
+html[data-theme="dark"] .hero-actions .found-action { background: #203a32; border-color: #426258; }
+html[data-theme="dark"] .theme-toggle { background: #1c342e; border-color: #426358; color: #f3d28d; }
+html[data-theme="dark"] .theme-toggle::after { transform: translateX(13px); background: #294a40; box-shadow: none; }
+html[data-theme="dark"] .theme-sun { opacity: .4; }
+html[data-theme="dark"] .theme-moon { opacity: 1; }
+html[data-theme="dark"] .hero .eyebrow, html[data-theme="dark"] #report-count { background: #203a32; border-color: #38564b; color: #b9d0bb; }
+html[data-theme="dark"] .hero-copy, html[data-theme="dark"] .quiet, html[data-theme="dark"] .storage-notice p, html[data-theme="dark"] .steps p, html[data-theme="dark"] .report-detail p { color: #b6c5bb; }
+html[data-theme="dark"] .hero-art { border-color: #284139; box-shadow: 0 22px 55px -30px #000b; }
+html[data-theme="dark"] .storage-notice { border-color: #29443c; }
+html[data-theme="dark"] .filters, html[data-theme="dark"] .report-card, html[data-theme="dark"] .map-panel { background: #172824; border-color: #2d493f; box-shadow: 0 10px 30px #0004; }
+html[data-theme="dark"] input, html[data-theme="dark"] select, html[data-theme="dark"] textarea { background: #10201c; border-color: #365349; color: #e6eee5; }
+html[data-theme="dark"] input::placeholder, html[data-theme="dark"] textarea::placeholder { color: #819388; }
+html[data-theme="dark"] .secondary, html[data-theme="dark"] .card-actions button { background: #203a32; color: #d7e6d8; border-color: #3a584d; }
+html[data-theme="dark"] .card-contact, html[data-theme="dark"] .radius-panel, html[data-theme="dark"] .how { background: #1f372f; border-color: #38554a; color: #dbe8dc; }
+html[data-theme="dark"] .card-bottom { border-color: #2e4a40; }
+html[data-theme="dark"] .card-actions .mark-found { background: #274936; border-color: #416b4a; }
+html[data-theme="dark"] .empty { background: #162722; border-color: #426052; color: #c2d0c4; }
+html[data-theme="dark"] .dialog-top, html[data-theme="dark"] .form-bottom { background: #172824; border-color: #2f4b40; }
+html[data-theme="dark"] dialog { background: #12211d; color: #e8f0e9; }
+html[data-theme="dark"] .icon-button { background: #203931; border-color: #3c594d; color: white; }
+html[data-theme="dark"] .map-heading .map-tag { background: #29443a; color: #d8e6d9; }
+html[data-theme="dark"] .leaflet-control-attribution { background: #15231fe8 !important; color: #d3e2d5; }
+html[data-theme="dark"] .leaflet-control-attribution a { color: #9ec8a5; }
+html[data-theme="dark"] .pet-pin-tooltip { background: #10251e; }
+html[data-theme="dark"] .leaflet-tooltip-top.pet-pin-tooltip::before { border-top-color: #10251e; }
 @media (prefers-reduced-motion: no-preference) {
   .pin-art { animation: pin-arrive .4s ease-out both; transition: filter .2s; }
   .pin-ground { animation: pin-ring 2.4s ease-out 2; }
@@ -104,6 +140,7 @@ dialog { border-radius: 24px; box-shadow: 0 25px 100px #102a2850; }
 @media (max-width: 1050px) {
   nav { gap: 15px; }
   nav .found-action { display: none; }
+  nav .theme-toggle { width: 38px; }
   .hero { gap: 32px; }
   .hero-art { height: 330px; }
   .hero h1 { font-size: 49px; }
@@ -117,6 +154,7 @@ dialog { border-radius: 24px; box-shadow: 0 25px 100px #102a2850; }
   .brand-logo { width: 33px; height: 33px; }
   .brand-country { font-size: 8px; letter-spacing: 1px; padding-left: 7px; }
   nav .button { border-radius: 10px; font-size: 10px; padding: 10px; }
+  nav .theme-toggle { width: 36px; height: 29px; }
   .hero { padding-block: 34px; gap: 28px; }
   .hero h1 { font-size: clamp(40px, 10vw, 54px); letter-spacing: -2px; }
   .hero-copy { font-size: 14px; }

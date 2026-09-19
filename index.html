@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="anonymous">
   <link rel="stylesheet" href="modern.css">
+  <script>try{const t=localStorage.getItem('pawfinder-theme');if(t==='dark'||(!t&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.dataset.theme='dark'}catch{}</script>
   <script type="module" src="js/app.js"></script>
 </head>
 
@@ -19,7 +20,7 @@
     <a class="brand" href="#"><img class="brand-logo" src="assets/pawfinder-logo.svg" alt=""> PawFinder<span
         class="brand-country">SYRIA</span></a>
     <nav aria-label="Main navigation"><a href="#reports">Find an animal</a><a href="#how-it-works">How it
-        works</a><button class="text-button found-action" data-new-report-status="found">I found an animal</button><button class="button" data-new-report>+ Report an animal</button></nav>
+        works</a><button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to night mode" aria-pressed="false" title="Switch to night mode"><span class="theme-sun" aria-hidden="true">☀</span><span class="theme-moon" aria-hidden="true">☾</span></button><button class="text-button found-action" data-new-report-status="found">I found an animal</button><button class="button" data-new-report>+ Report an animal</button></nav>
   </header>
   <main>
     <section class="hero wrap">
